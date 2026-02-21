@@ -1,0 +1,13 @@
+{
+  "name": "tomdream-artworks",
+  "version": "1.0.0",
+  "description": "Tom Dream的绘画作品集",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server",
+    "build": "echo 'Building...'"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.3"
+  }
+}

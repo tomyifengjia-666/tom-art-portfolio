@@ -46,9 +46,9 @@
   <div class="works-grid" id="worksContainer"></div>
 
   <script>
-    // 配置Notion信息（从环境变量读取，Vercel部署时设置）
-    const NOTION_TOKEN = process.env.NOTION_TOKEN ; // 本地开发时使用默认值
-    const DATABASE_ID = "30ed872b-594c-8188-859b-00376a084601"; // 数据库ID
+    // 配置Notion信息
+    const NOTION_TOKEN = process.env.NOTION_TOKEN ; // 如：secret_xxxxxx
+    const DATABASE_ID = "30ed872b-594c-8188-859b-00376a084601"; // 如：1234567890abcdef1234567890abcdef
 
     // 全局变量：存储所有作品数据
     let allWorks = [];
@@ -67,37 +67,17 @@
       }
     };
 
-    // 从Notion API获取作品数据
+    // 从本地API获取作品数据
     async function fetchWorksFromNotion() {
-      const url = `https://api.notion.com/v1/databases/${DATABASE_ID}/query`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${NOTION_TOKEN}`,
-          "Notion-Version": "2022-06-28", // API版本固定值
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          sorts: [{ property: "排序", direction: "ascending" }] // 按「排序」字段升序
-        })
-      });
+      const response = await fetch('/api/notion');
 
       if (!response.ok) {
-        throw new Error(`Notion API请求错误：${response.status}`);
+        throw new Error(`API请求错误：${response.status}`);
       }
 
       const data = await response.json();
-      // 解析Notion返回的数据，转换成前端可用的格式
-      allWorks = data.results.map(item => {
-        return {
-          id: item.id,
-          title: item.properties.标题.title[0]?.plain_text || "未命名作品",
-          category: item.properties.分类.select?.name || "未分类",
-          desc: item.properties.描述.rich_text[0]?.plain_text || "无描述",
-          // 处理图片：Notion返回的是文件链接，需要拼接
-          imgUrl: item.properties.图片.files[0]?.file?.url || item.properties.图片.files[0]?.external?.url || ""
-        };
-      });
+      // 使用API返回的数据
+      allWorks = data;
     }
 
     // 渲染作品列表（支持分类筛选）
